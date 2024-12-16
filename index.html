@@ -7,22 +7,26 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #121212;
+            color: #ddd;
             margin: 0;
             padding: 20px;
+            overflow: hidden;
         }
         .container {
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-between;
+            justify-content: space-around;
+            align-items: flex-start;
         }
         .clock, .weather {
-            background: white;
+            background: #1e1e1e;
             border-radius: 8px;
             padding: 20px;
             margin: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
             width: 45%;
+            min-width: 280px;
         }
         .time-zone {
             font-size: 1.5em;
@@ -35,7 +39,7 @@
         .weather h3 {
             margin-top: 0;
         }
-        .weather .forecast {
+        .forecast {
             display: flex;
             justify-content: space-between;
         }
@@ -45,7 +49,17 @@
         }
         .highlight {
             font-weight: bold;
-            color: #d9534f;
+            color: #e74c3c;
+        }
+        /* Adjustments for smaller screen widths */
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .clock, .weather {
+                width: 80%;
+            }
         }
     </style>
 </head>
@@ -54,12 +68,13 @@
 <div class="container">
     <div class="clock">
         <h2>World Clock</h2>
-        <div id="timezone1" class="time-zone">New York: <span></span></div>
-        <div id="timezone2" class="time-zone">London: <span></span></div>
-        <div id="timezone3" class="time-zone">Tokyo: <span></span></div>
-        <div id="timezone4" class="time-zone">Sydney: <span></span></div>
-        <div id="timezone5" class="time-zone">Paris: <span></span></div>
-        <div id="timezone6" class="time-zone">Moscow: <span></span></div>
+        <div id="timezone1" class="time-zone">Hawaii: <span></span></div>
+        <div id="timezone2" class="time-zone">Pacific: <span></span></div>
+        <div id="timezone3" class="time-zone">Mountain: <span></span></div>
+        <div id="timezone4" class="time-zone">Central: <span></span></div>
+        <div id="timezone5" class="time-zone">Eastern: <span></span></div>
+        <div id="timezone6" class="time-zone">CentralEuropean: <span></span></div>
+        <div id="timezone6" class="time-zone">Japan: <span></span></div>
         <div id="current-date" class="date"></div>
     </div>
 
@@ -102,9 +117,9 @@ function updateTime() {
 }
 
 // Weather API (replace with your API key)
-const apiKey = "2e4d90d4530dbb7d8282948209783cf4"; // Use your weather API key here
-const city = "Chesterfield"; // City for weather
-const units = "imperial"; // Temperature units (metric, imperial)
+const apiKey = "YOUR_API_KEY"; // Use your weather API key here
+const city = "St. Louis"; // City for weather
+const units = "metric"; // Temperature units (metric, imperial)
 
 // Fetch weather data
 function fetchWeather() {
