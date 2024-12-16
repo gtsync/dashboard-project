@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
   <style>
+    :root {
+      --bg-color: #f0f4f8;
+      --text-color: #000;
+      --widget-bg: #fff;
+      --widget-border: #ddd;
+    }
+    [data-theme="dark"] {
+      --bg-color: #121212;
+      --text-color: #fff;
+      --widget-bg: #1e1e1e;
+      --widget-border: #333;
+    }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -14,7 +27,9 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
-      background: #f0f4f8;
+      background: var(--bg-color);
+      color: var(--text-color);
+      transition: background 0.3s, color 0.3s;
     }
     header {
       font-size: 1.5rem;
@@ -28,22 +43,36 @@
       width: 100%;
     }
     .widget {
-      background: #fff;
-      border: 1px solid #ddd;
+      background: var(--widget-bg);
+      border: 1px solid var(--widget-border);
       border-radius: 8px;
       padding: 1rem;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       text-align: center;
       min-width: 200px;
       flex: 1;
+      transition: background 0.3s, border 0.3s;
     }
     .widget h2 {
       margin-bottom: 0.5rem;
+    }
+    #theme-toggle {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--widget-bg);
+      color: var(--text-color);
+      border: 1px solid var(--widget-border);
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s, border 0.3s;
     }
   </style>
 </head>
 <body>
   <header>Dashboard</header>
+  <button id="theme-toggle">Switch to Dark Mode</button>
   <div class="container">
     <!-- Clock -->
     <div class="widget" id="world-clock">
@@ -65,6 +94,14 @@
   </div>
 
   <script>
+    // Dark Mode Toggle
+    const themeToggle = document.getElementById("theme-toggle");
+    themeToggle.addEventListener("click", () => {
+      const isDarkMode = document.body.getAttribute("data-theme") === "dark";
+      document.body.setAttribute("data-theme", isDarkMode ? "light" : "dark");
+      themeToggle.textContent = isDarkMode ? "Switch to Dark Mode" : "Switch to Light Mode";
+    });
+
     // World Clock
     function updateClock() {
       const cities = [
