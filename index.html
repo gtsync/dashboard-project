@@ -1,143 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
-  <style>
-    :root {
-      --bg-color: #f0f4f8;
-      --text-color: #000;
-      --widget-bg: #fff;
-      --widget-border: #ddd;
-    }
-    [data-theme="dark"] {
-      --bg-color: #121212;
-      --text-color: #fff;
-      --widget-bg: #1e1e1e;
-      --widget-border: #333;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: var(--bg-color);
-      color: var(--text-color);
-      transition: background 0.3s, color 0.3s;
-    }
-    header {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-    }
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      justify-content: center;
-      width: 100%;
-    }
-    .widget {
-      background: var(--widget-bg);
-      border: 1px solid var(--widget-border);
-      border-radius: 8px;
-      padding: 1rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      min-width: 200px;
-      flex: 1;
-      transition: background 0.3s, border 0.3s;
-    }
-    .widget h2 {
-      margin-bottom: 0.5rem;
-    }
-    #theme-toggle {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: var(--widget-bg);
-      color: var(--text-color);
-      border: 1px solid var(--widget-border);
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s, color 0.3s, border 0.3s;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            overflow: auto;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 10px 20px;
+            background-color: #1e1e1e;
+        }
+        header h1 {
+            margin: 0;
+        }
+        #dark-mode-toggle {
+            cursor: pointer;
+            padding: 5px 10px;
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 5px;
+        }
+        #world-clock, #calendar, #weather {
+            margin: 20px 0;
+        }
+        #calendar table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #calendar th, #calendar td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        #calendar .today {
+            background-color: #ff0;
+            color: #000;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-  <header>Dashboard</header>
-  <button id="theme-toggle">Switch to Dark Mode</button>
-  <div class="container">
-    <!-- Clock -->
-    <div class="widget" id="world-clock">
-      <h2>World Clock</h2>
-      <div id="clock-content">Loading...</div>
+    <header>
+        <h1>My Dashboard</h1>
+        <button id="dark-mode-toggle">Dark Mode</button>
+    </header>
+
+    <div id="world-clock">
+        <h2>World Clock</h2>
+        <div id="clock-display"></div>
     </div>
 
-    <!-- Calendar -->
-    <div class="widget" id="calendar">
-      <h2>Calendar</h2>
-      <div id="calendar-content"></div>
-    </div>
+    <div id="calendar"></div>
 
-    <!-- Weather -->
-    <div class="widget" id="weather">
-      <h2>Weather</h2>
-      <div id="weather-content">Fetching weather...</div>
-    </div>
-  </div>
+    <div id="weather"></div>
 
-  <script>
-    // Dark Mode Toggle
-    const themeToggle = document.getElementById("theme-toggle");
-    themeToggle.addEventListener("click", () => {
-      const isDarkMode = document.body.getAttribute("data-theme") === "dark";
-      document.body.setAttribute("data-theme", isDarkMode ? "light" : "dark");
-      themeToggle.textContent = isDarkMode ? "Switch to Dark Mode" : "Switch to Light Mode";
-    });
+    <script>
+        // Dark Mode Toggle
+        const toggleButton = document.getElementById('dark-mode-toggle');
+        toggleButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                document.body.style.backgroundColor = '#121212';
+                document.body.style.color = '#ffffff';
+                toggleButton.style.backgroundColor = '#ffffff';
+                toggleButton.style.color = '#000000';
+                toggleButton.textContent = 'Light Mode';
+            } else {
+                document.body.style.backgroundColor = '#ffffff';
+                document.body.style.color = '#000000';
+                toggleButton.style.backgroundColor = '#000000';
+                toggleButton.style.color = '#ffffff';
+                toggleButton.textContent = 'Dark Mode';
+            }
+        });
 
-    // World Clock
-    function updateClock() {
-      const cities = [
-        { name: "New York", offset: -5 },
-        { name: "London", offset: 0 },
-        { name: "Tokyo", offset: 9 },
-        { name: "Sydney", offset: 11 },
-        { name: "Chesterfield", offset: -6 }
-      ];
-      const now = new Date();
-      const clockContent = document.getElementById("clock-content");
-      clockContent.innerHTML = cities
-        .map(city => {
-          const localTime = new Date(now.getTime() + city.offset * 3600 * 1000);
-          return `<div>${city.name}: ${localTime.toLocaleTimeString()}</div>`;
-        })
-        .join("");
-    }
-    setInterval(updateClock, 1000);
+        // World Clock
+        const cities = [
+            { name: "New York", offset: -5 },
+            { name: "London", offset: 0 },
+            { name: "Tokyo", offset: 9 },
+            { name: "Sydney", offset: 11 },
+            { name: "Dubai", offset: 4 }
+        ];
 
-    // Calendar
-    function updateCalendar() {
-      const today = new Date();
-      const calendarContent = document.getElementById("calendar-content");
-      const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-      calendarContent.innerHTML = `<div>${today.toLocaleDateString("en-US", options)}</div>`;
-    }
-    updateCalendar();
+        function updateClock() {
+            const now = new Date();
+            let clockHTML = '';
 
-    // Weather (Static Example)
-    function updateWeather() {
-      // Mock weather data (replace with API calls if needed)
-      const weatherContent = document.getElementById("weather-content");
-      weatherContent.innerHTML = "Clear skies, 72°F";
-    }
-    updateWeather();
-  </script>
+            cities.forEach(city => {
+                const cityTime = new Date(now.getTime() + city.offset * 3600000 + now.getTimezoneOffset() * 60000);
+                clockHTML += `<div>${city.name}: ${cityTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</div>`;
+            });
+
+            document.getElementById('clock-display').innerHTML = clockHTML;
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Calendar
+        function generateCalendar() {
+            const calendarContainer = document.getElementById("calendar");
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+
+            let calendarHTML = `<h2>${today.toLocaleString('default', { month: 'long' })} ${currentYear}</h2>`;
+            calendarHTML += `<table><tr>`;
+            const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+            // Add day headers
+            daysOfWeek.forEach(day => {
+                calendarHTML += `<th>${day}</th>`;
+            });
+            calendarHTML += `</tr><tr>`;
+
+            // Empty cells for days before the 1st
+            for (let i = 0; i < firstDay; i++) {
+                calendarHTML += `<td></td>`;
+            }
+
+            // Add the days
+            for (let day = 1; day <= daysInMonth; day++) {
+                if ((day + firstDay - 1) % 7 === 0 && day !== 1) {
+                    calendarHTML += `</tr><tr>`;
+                }
+                const isToday = day === today.getDate();
+                calendarHTML += `<td${isToday ? ' class="today"' : ''}>${day}</td>`;
+            }
+
+            calendarHTML += `</tr></table>`;
+            calendarContainer.innerHTML = calendarHTML;
+        }
+
+        generateCalendar();
+
+        // Weather
+        const weatherContainer = document.getElementById("weather");
+        const apiKey = 'YOUR_API_KEY'; // Replace with your OpenWeatherMap API key
+        const city = 'St. Louis'; // Replace with your preferred city
+
+        fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=imperial&cnt=6&appid=${apiKey}`)
+            .then(response => response.json())
+            .then(data => {
+                let weatherHTML = `<h2>Weather in ${city}</h2>`;
+                data.list.forEach(item => {
+                    const time = new Date(item.dt * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    weatherHTML += `
+                        <div>
+                            <strong>${time}</strong>: ${item.main.temp}°F, ${item.weather[0].description}
+                        </div>`;
+                });
+                weatherContainer.innerHTML = weatherHTML;
+            })
+            .catch(error => {
+                weatherContainer.innerHTML = `<p>Error fetching weather data.</p>`;
+            });
+    </script>
 </body>
 </html>
