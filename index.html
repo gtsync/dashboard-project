@@ -1,56 +1,185 @@
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #121212;
-        color: #ffffff;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 10px;
-        justify-content: center;
-        align-items: start;
-        height: 100%;
-        box-sizing: border-box;
-    }
-    header {
-        grid-column: span 2; /* Makes header span across all columns */
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 20px;
-        background-color: #1e1e1e;
-    }
-    header h1 {
-        margin: 0;
-    }
-    #dark-mode-toggle {
-        cursor: pointer;
-        padding: 5px 10px;
-        background-color: #ffffff;
-        color: #000000;
-        border: none;
-        border-radius: 5px;
-    }
-    #world-clock, #calendar, #weather {
-        margin: 10px;
-        padding: 10px;
-        background-color: #1e1e1e;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-    }
-    #calendar table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    #calendar th, #calendar td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: center;
-    }
-    #calendar .today {
-        background-color: #ff0;
-        color: #000;
-        font-weight: bold;
-    }
-</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #ffffff;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            justify-content: center;
+            align-items: start;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        header {
+            grid-column: span 2; /* Makes header span across all columns */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #1e1e1e;
+        }
+        header h1 {
+            margin: 0;
+        }
+        #dark-mode-toggle {
+            cursor: pointer;
+            padding: 5px 10px;
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 5px;
+        }
+        #world-clock, #calendar, #weather {
+            margin: 10px;
+            padding: 10px;
+            background-color: #1e1e1e;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        #calendar table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #calendar th, #calendar td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        #calendar .today {
+            background-color: #ff0;
+            color: #000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>My Dashboard</h1>
+        <button id="dark-mode-toggle">Dark Mode</button>
+    </header>
+
+    <div id="world-clock">
+        <h2>World Clock</h2>
+        <div id="clock-display"></div>
+    </div>
+
+    <div id="calendar"></div>
+
+    <div id="weather"></div>
+
+    <script>
+        // Dark Mode Toggle
+        const toggleButton = document.getElementById('dark-mode-toggle');
+        toggleButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                document.body.style.backgroundColor = '#121212';
+                document.body.style.color = '#ffffff';
+                toggleButton.style.backgroundColor = '#ffffff';
+                toggleButton.style.color = '#000000';
+                toggleButton.textContent = 'Light Mode';
+            } else {
+                document.body.style.backgroundColor = '#ffffff';
+                document.body.style.color = '#000000';
+                toggleButton.style.backgroundColor = '#000000';
+                toggleButton.style.color = '#ffffff';
+                toggleButton.textContent = 'Dark Mode';
+            }
+        });
+
+        // World Clock
+        const cities = [
+            { name: "New York", offset: -5 },
+            { name: "London", offset: 0 },
+            { name: "Tokyo", offset: 9 },
+            { name: "Sydney", offset: 11 },
+            { name: "Dubai", offset: 4 }
+        ];
+
+        function updateClock() {
+            const now = new Date();
+            let clockHTML = '';
+
+            cities.forEach(city => {
+                const cityTime = new Date(now.getTime() + city.offset * 3600000 + now.getTimezoneOffset() * 60000);
+                clockHTML += `<div>${city.name}: ${cityTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</div>`;
+            });
+
+            document.getElementById('clock-display').innerHTML = clockHTML;
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Calendar
+        function generateCalendar() {
+            const calendarContainer = document.getElementById("calendar");
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+
+            let calendarHTML = `<h2>${today.toLocaleString('default', { month: 'long' })} ${currentYear}</h2>`;
+            calendarHTML += `<table><tr>`;
+            const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+            // Add day headers
+            daysOfWeek.forEach(day => {
+                calendarHTML += `<th>${day}</th>`;
+            });
+            calendarHTML += `</tr><tr>`;
+
+            // Empty cells for days before the 1st
+            for (let i = 0; i < firstDay; i++) {
+                calendarHTML += `<td></td>`;
+            }
+
+            // Add the days
+            for (let day = 1; day <= daysInMonth; day++) {
+                if ((day + firstDay - 1) % 7 === 0 && day !== 1) {
+                    calendarHTML += `</tr><tr>`;
+                }
+                const isToday = day === today.getDate();
+                calendarHTML += `<td${isToday ? ' class="today"' : ''}>${day}</td>`;
+            }
+
+            calendarHTML += `</tr></table>`;
+            calendarContainer.innerHTML = calendarHTML;
+        }
+
+        generateCalendar();
+
+        // Weather
+        const weatherContainer = document.getElementById("weather");
+        const apiKey = '2e4d90d4530dbb7d8282948209783cf4'; // Replace with your OpenWeatherMap API key
+        const city = 'Chesterfield'; // Replace with your preferred city
+
+        fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=imperial&cnt=6&appid=${apiKey}`)
+            .then(response => response.json())
+            .then(data => {
+                let weatherHTML = `<h2>Weather in ${city}</h2>`;
+                data.list.forEach(item => {
+                    const time = new Date(item.dt * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    weatherHTML += `
+                        <div>
+                            <strong>${time}</strong>: ${item.main.temp}°F, ${item.weather[0].description}
+                        </div>`;
+                });
+                weatherContainer.innerHTML = weatherHTML;
+            })
+            .catch(error => {
+                weatherContainer.innerHTML = `<p>Error fetching weather data.</p>`;
+            });
+    </script>
+</body>
+</html>
