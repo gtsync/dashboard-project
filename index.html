@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f0f4f8;
+    }
+    header {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      width: 100%;
+    }
+    .widget {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      min-width: 200px;
+      flex: 1;
+    }
+    .widget h2 {
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header>Dashboard</header>
+  <div class="container">
+    <!-- Clock -->
+    <div class="widget" id="world-clock">
+      <h2>World Clock</h2>
+      <div id="clock-content">Loading...</div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="widget" id="calendar">
+      <h2>Calendar</h2>
+      <div id="calendar-content"></div>
+    </div>
+
+    <!-- Weather -->
+    <div class="widget" id="weather">
+      <h2>Weather</h2>
+      <div id="weather-content">Fetching weather...</div>
+    </div>
+  </div>
+
+  <script>
+    // World Clock
+    function updateClock() {
+      const cities = [
+        { name: "New York", offset: -5 },
+        { name: "London", offset: 0 },
+        { name: "Tokyo", offset: 9 },
+        { name: "Sydney", offset: 11 },
+        { name: "Chesterfield", offset: -6 }
+      ];
+      const now = new Date();
+      const clockContent = document.getElementById("clock-content");
+      clockContent.innerHTML = cities
+        .map(city => {
+          const localTime = new Date(now.getTime() + city.offset * 3600 * 1000);
+          return `<div>${city.name}: ${localTime.toLocaleTimeString()}</div>`;
+        })
+        .join("");
+    }
+    setInterval(updateClock, 1000);
+
+    // Calendar
+    function updateCalendar() {
+      const today = new Date();
+      const calendarContent = document.getElementById("calendar-content");
+      const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+      calendarContent.innerHTML = `<div>${today.toLocaleDateString("en-US", options)}</div>`;
+    }
+    updateCalendar();
+
+    // Weather (Static Example)
+    function updateWeather() {
+      // Mock weather data (replace with API calls if needed)
+      const weatherContent = document.getElementById("weather-content");
+      weatherContent.innerHTML = "Clear skies, 72°F";
+    }
+    updateWeather();
+  </script>
+</body>
+</html>
