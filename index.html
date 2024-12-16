@@ -3,183 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>World Clock and Weather</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
             margin: 0;
-            padding: 0;
-            background-color: #121212;
-            color: #ffffff;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 10px;
-            justify-content: center;
-            align-items: start;
-            height: 100%;
-            box-sizing: border-box;
+            padding: 20px;
         }
-        header {
-            grid-column: span 2; /* Makes header span across all columns */
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .clock, .weather {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 45%;
+        }
+        .time-zone {
+            font-size: 1.5em;
+            margin: 10px 0;
+        }
+        .date {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        .weather h3 {
+            margin-top: 0;
+        }
+        .weather .forecast {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: #1e1e1e;
         }
-        header h1 {
-            margin: 0;
+        .forecast img {
+            width: 30px;
+            height: 30px;
         }
-        #dark-mode-toggle {
-            cursor: pointer;
-            padding: 5px 10px;
-            background-color: #ffffff;
-            color: #000000;
-            border: none;
-            border-radius: 5px;
-        }
-        #world-clock, #calendar, #weather {
-            margin: 10px;
-            padding: 10px;
-            background-color: #1e1e1e;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-        }
-        #calendar table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        #calendar th, #calendar td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        #calendar .today {
-            background-color: #ff0;
-            color: #000;
+        .highlight {
             font-weight: bold;
+            color: #d9534f;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>My Dashboard</h1>
-        <button id="dark-mode-toggle">Dark Mode</button>
-    </header>
 
-    <div id="world-clock">
+<div class="container">
+    <div class="clock">
         <h2>World Clock</h2>
-        <div id="clock-display"></div>
+        <div id="timezone1" class="time-zone">New York: <span></span></div>
+        <div id="timezone2" class="time-zone">London: <span></span></div>
+        <div id="timezone3" class="time-zone">Tokyo: <span></span></div>
+        <div id="timezone4" class="time-zone">Sydney: <span></span></div>
+        <div id="timezone5" class="time-zone">Paris: <span></span></div>
+        <div id="timezone6" class="time-zone">Moscow: <span></span></div>
+        <div id="current-date" class="date"></div>
     </div>
 
-    <div id="calendar"></div>
+    <div class="weather">
+        <h3>Weather</h3>
+        <div id="current-weather"></div>
+        <div class="forecast">
+            <div id="hourly-forecast"></div>
+            <div id="daily-forecast"></div>
+        </div>
+    </div>
+</div>
 
-    <div id="weather"></div>
+<script>
+// Time Zones
+const timeZones = [
+    { id: "timezone5", name: "Hawai'i", offset: -10 },
+    { id: "timezone4", name: "Pacific", offset: -8 },
+    { id: "timezone4", name: "Mountain", offset: -7 },
+    { id: "timezone4", name: "Central", offset: -6 },
+    { id: "timezone1", name: "Eastern", offset: -5 },
+    { id: "timezone2", name: "Central European", offset: 1 },
+    { id: "timezone3", name: "Japan", offset: 9 }
+];
 
-    <script>
-        // Dark Mode Toggle
-        const toggleButton = document.getElementById('dark-mode-toggle');
-        toggleButton.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            if (document.body.classList.contains('dark-mode')) {
-                document.body.style.backgroundColor = '#121212';
-                document.body.style.color = '#ffffff';
-                toggleButton.style.backgroundColor = '#ffffff';
-                toggleButton.style.color = '#000000';
-                toggleButton.textContent = 'Light Mode';
-            } else {
-                document.body.style.backgroundColor = '#ffffff';
-                document.body.style.color = '#000000';
-                toggleButton.style.backgroundColor = '#000000';
-                toggleButton.style.color = '#ffffff';
-                toggleButton.textContent = 'Dark Mode';
-            }
-        });
+// Function to update time for all time zones
+function updateTime() {
+    const now = new Date();
+    const dayOfWeek = now.toLocaleString('en-US', { weekday: 'long' });
+    const day = now.getDate();
+    const month = now.toLocaleString('en-US', { month: 'long' });
+    const year = now.getFullYear();
 
-        // World Clock
-        const cities = [
-            { name: "New York", offset: -5 },
-            { name: "London", offset: 0 },
-            { name: "Tokyo", offset: 9 },
-            { name: "Sydney", offset: 11 },
-            { name: "Dubai", offset: 4 }
-        ];
+    document.getElementById('current-date').textContent = `${dayOfWeek} ${month} ${day < 10 ? '0' + day : day}, ${year}`;
 
-        function updateClock() {
-            const now = new Date();
-            let clockHTML = '';
+    timeZones.forEach(zone => {
+        const time = new Date(now.getTime() + zone.offset * 60 * 60 * 1000);
+        document.getElementById(zone.id).querySelector('span').textContent = time.toLocaleTimeString();
+    });
+}
 
-            cities.forEach(city => {
-                const cityTime = new Date(now.getTime() + city.offset * 3600000 + now.getTimezoneOffset() * 60000);
-                clockHTML += `<div>${city.name}: ${cityTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</div>`;
+// Weather API (replace with your API key)
+const apiKey = "2e4d90d4530dbb7d8282948209783cf4"; // Use your weather API key here
+const city = "Chesterfield"; // City for weather
+const units = "imperial"; // Temperature units (metric, imperial)
+
+// Fetch weather data
+function fetchWeather() {
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${units}`)
+        .then(response => response.json())
+        .then(data => {
+            const temp = data.main.temp;
+            const description = data.weather[0].description;
+            const icon = `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+
+            document.getElementById('current-weather').innerHTML = `
+                <p><strong>Current Temperature:</strong> ${temp}°C</p>
+                <p><strong>Description:</strong> ${description}</p>
+                <img src="${icon}" alt="${description}">
+            `;
+        })
+        .catch(error => console.error("Error fetching weather:", error));
+}
+
+// Function to fetch hourly and daily forecast
+function fetchForecast() {
+    fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=${units}`)
+        .then(response => response.json())
+        .then(data => {
+            let hourlyHtml = "<h4>Next Few Hours:</h4><ul>";
+            data.list.slice(0, 6).forEach(hour => {
+                const time = new Date(hour.dt * 1000).toLocaleTimeString();
+                const temp = hour.main.temp;
+                const icon = `https://openweathermap.org/img/wn/${hour.weather[0].icon}.png`;
+                hourlyHtml += `<li>${time}: ${temp}°C <img src="${icon}" alt="weather icon"></li>`;
             });
+            hourlyHtml += "</ul>";
+            document.getElementById('hourly-forecast').innerHTML = hourlyHtml;
 
-            document.getElementById('clock-display').innerHTML = clockHTML;
-        }
-
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // Calendar
-        function generateCalendar() {
-            const calendarContainer = document.getElementById("calendar");
-            const today = new Date();
-            const currentMonth = today.getMonth();
-            const currentYear = today.getFullYear();
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-
-            let calendarHTML = `<h2>${today.toLocaleString('default', { month: 'long' })} ${currentYear}</h2>`;
-            calendarHTML += `<table><tr>`;
-            const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-            // Add day headers
-            daysOfWeek.forEach(day => {
-                calendarHTML += `<th>${day}</th>`;
+            let dailyHtml = "<h4>Next Few Days:</h4><ul>";
+            data.list.slice(0, 5).forEach(day => {
+                const date = new Date(day.dt * 1000).toLocaleDateString();
+                const temp = day.main.temp;
+                const icon = `https://openweathermap.org/img/wn/${day.weather[0].icon}.png`;
+                dailyHtml += `<li>${date}: ${temp}°C <img src="${icon}" alt="weather icon"></li>`;
             });
-            calendarHTML += `</tr><tr>`;
+            dailyHtml += "</ul>";
+            document.getElementById('daily-forecast').innerHTML = dailyHtml;
+        })
+        .catch(error => console.error("Error fetching forecast:", error));
+}
 
-            // Empty cells for days before the 1st
-            for (let i = 0; i < firstDay; i++) {
-                calendarHTML += `<td></td>`;
-            }
+// Update time every second
+setInterval(updateTime, 1000);
 
-            // Add the days
-            for (let day = 1; day <= daysInMonth; day++) {
-                if ((day + firstDay - 1) % 7 === 0 && day !== 1) {
-                    calendarHTML += `</tr><tr>`;
-                }
-                const isToday = day === today.getDate();
-                calendarHTML += `<td${isToday ? ' class="today"' : ''}>${day}</td>`;
-            }
+// Load weather data
+fetchWeather();
+fetchForecast();
+</script>
 
-            calendarHTML += `</tr></table>`;
-            calendarContainer.innerHTML = calendarHTML;
-        }
-
-        generateCalendar();
-
-        // Weather
-        const weatherContainer = document.getElementById("weather");
-        const apiKey = '2e4d90d4530dbb7d8282948209783cf4'; // Replace with your OpenWeatherMap API key
-        const city = 'Chesterfield'; // Replace with your preferred city
-
-        fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=imperial&cnt=6&appid=${apiKey}`)
-            .then(response => response.json())
-            .then(data => {
-                let weatherHTML = `<h2>Weather in ${city}</h2>`;
-                data.list.forEach(item => {
-                    const time = new Date(item.dt * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    weatherHTML += `
-                        <div>
-                            <strong>${time}</strong>: ${item.main.temp}°F, ${item.weather[0].description}
-                        </div>`;
-                });
-                weatherContainer.innerHTML = weatherHTML;
-            })
-            .catch(error => {
-                weatherContainer.innerHTML = `<p>Error fetching weather data.</p>`;
-            });
-    </script>
 </body>
 </html>
